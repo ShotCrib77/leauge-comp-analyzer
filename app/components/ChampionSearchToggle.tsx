@@ -14,78 +14,75 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../../components/ui/popover";
-import { X, Check } from "lucide-react";
+import {ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CHAMPIONS } from "../lib/constants";
 
-const ITEMS = [
-  "Next.js",
-  "SvelteKit",
-  "Nuxt.js",
-  "Remix",
-  "Astro",
-  "Gatsby",
-  "React Router",
-  "TanStack Start",
-  "Qwik City",
-  "SolidStart",
-];
-
-export default function ChampionSearchToggle() {
+export default function ChampionSearchToggle({selectedChamp, setSelectedChamp, direction}: { selectedChamp: string, setSelectedChamp: (champ: string) => void, direction?: "left" | "right"}) {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
 
   return (
     <div className="flex items-center gap-2">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
             size="icon"
             className={cn(
-              "h-8 w-8 shrink-0 transition-colors",
-              open && "bg-accent text-accent-foreground"
+              "h-8 w-8 shrink-0 transition-colors bg-black text-white",
+              open && ""
             )}
             aria-label="Toggle search"
           >
-            <X className="h-4 w-4" />
+            {direction === "left" ? 
+              <ArrowLeft
+                className={`h-4 w-4 transition-transform duration-250 ${open ? "-rotate-90" : ""}`}
+              />
+            :
+              <ArrowRight
+                className={`h-4 w-4 transition-transform duration-250 ${open ? "rotate-90" : ""}`}
+              />
+            }
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-50 p-0"
+          className="w-40 p-0 bg-black text-white shadow-2xl max-h-36"
           align="start"
-          side="right"
+          side={direction === "left" ? "left" : "right"}
           sideOffset={8}
         >
-          <Command className="font-mono">
-            <CommandInput placeholder="Search..." />
-            <CommandList>
+        <Command 
+          className="font-serif bg-black text-white text-xs"
+          filter={(value, search) => {
+            if (value.toLowerCase().startsWith(search.toLowerCase())) return 1;
+              return 0;
+          }}
+        >
+          <CommandInput placeholder="Search..." className="h-7 text-xs" />
+            <CommandList className="pt-1">
               <CommandEmpty>No results found.</CommandEmpty>
-              {ITEMS.map((item) => (
+              {Object.entries(CHAMPIONS).map(([value, label]) => (
                 <CommandItem
-                  key={item}
-                  value={item}
-                  onSelect={(val) => {
-                    setSelected(val === selected ? null : val);
+                  key={label}
+                  value={label}
+                  className="text-xs py-1.5 data-[selectedChamp=true]:bg-zinc-800 data-[selectedChamp=true]:text-white"
+                  onSelect={() => {
+                    setSelectedChamp(value === selectedChamp ? "" : value);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
-                      selected === item ? "opacity-100" : "opacity-0"
+                      "mr-2 h-4 w-4 text-white!",
+                      selectedChamp === value ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {item}
+                  {label}
                 </CommandItem>
               ))}
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
-
-      {selected && (
-        <span className="text-sm text-muted-foreground">{selected}</span>
-      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import ChampionCard from "./ChampionCard";
+import TeamBadges from "./TeamBadges";
 
 export default function TeamChampions() {
 	const [blueSideChamps, setBlueSideChamps] = useState({
@@ -39,6 +40,7 @@ export default function TeamChampions() {
 					<h2 className="mt-2 text-base lg:text-lg tracking-widest uppercase text-blue-500" style={{textShadow: "0 1px 4px #000, 0 1px 4px #000"}}>
 						Blue Side
 					</h2>
+
 					<ChampionCard selectedChamp={blueSideChamps.top}     setSelectedChamp={(champ: string) => handleChampChange("blue", "top", champ)}     />
 					<ChampionCard selectedChamp={blueSideChamps.jungle}  setSelectedChamp={(champ: string) => handleChampChange("blue", "jungle", champ)}  />
 					<ChampionCard selectedChamp={blueSideChamps.middle}  setSelectedChamp={(champ: string) => handleChampChange("blue", "middle", champ)}  />
@@ -57,7 +59,7 @@ export default function TeamChampions() {
 					<ChampionCard selectedChamp={redSideChamps.utility} setSelectedChamp={(champ: string) => handleChampChange("red", "utility", champ)} direction="left" />
 				</div>
 			</div>
-
+			<TeamBadges blueSideChamps={blueSideChamps} redSideChamps={redSideChamps} />
 		</div>
 	);
 }

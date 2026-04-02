@@ -1,3 +1,5 @@
+export const SLIGHT_ADVANTAGE_THRESHOLD = 15
+export const BIG_ADVANTAGE_THRESHOLD = 35
 export const DDRAGON_VERSION = "16.5.1";
 
 export const CHAMPIONS: Record<string, string> = {

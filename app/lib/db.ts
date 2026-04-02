@@ -1,12 +1,11 @@
 import postgres from "postgres";
 
-const pool = postgres({
-    host: process.env.POSTGRES_HOST,
-    database: process.env.POSTGRES_DB,
-    username: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    port: 5432,
+const pool = postgres(process.env.DATABASE_URL!, {
+  max: 10,
+  idle_timeout: 20,
+  connect_timeout: 10,
 });
+
 
 export async function getChampData(champion: string): Promise<ChampionGameStat[]> {
 	const result = await pool<ChampionGameStat[]>`
@@ -30,7 +29,7 @@ export async function getEarly(championNames: string[]) {
         const champ = result.find(r => r.championName === name)
         if (!champ) return null
         return (champ.score - champ.minScore) / (champ.maxScore - champ.minScore) * 100
-    })
+    }).filter(v => v !== null)
 }
 
 export async function getLateGame(championNames: string[]) {
@@ -55,7 +54,7 @@ export async function getLateGame(championNames: string[]) {
         const champ = result.find(r => r.championName === name)
         if (!champ) return null
         return (champ.score - champ.minScore) / (champ.maxScore - champ.minScore) * 100
-    })
+    }).filter(v => v !== null)
 }
 
 export async function getPoke(championNames: string[]) {
@@ -73,7 +72,7 @@ export async function getPoke(championNames: string[]) {
         const champ = result.find(r => r.championName === name)
         if (!champ) return null
         return (champ.score - champ.minScore) / (champ.maxScore - champ.minScore) * 100
-    })
+    }).filter(v => v !== null)
 }
 
 export async function getEngage(championNames: string[]) {
@@ -91,7 +90,7 @@ export async function getEngage(championNames: string[]) {
         const champ = result.find(r => r.championName === name)
         if (!champ) return null
         return (champ.score - champ.minScore) / (champ.maxScore - champ.minScore) * 100
-    })
+    }).filter(v => v !== null)
 }
 
 export async function getPick(championNames: string[]) {
@@ -109,5 +108,23 @@ export async function getPick(championNames: string[]) {
         const champ = result.find(r => r.championName === name)
         if (!champ) return null
         return (champ.score - champ.minScore) / (champ.maxScore - champ.minScore) * 100
-    })
+    }).filter(v => v !== null)
+}
+
+export async function getTeamfight(championNames: string[]) {
+    const result = await pool`
+        SELECT 
+            "championName",
+            AVG("teamfightKills") as "score",
+            MIN(AVG("teamfightKills")) OVER () as "minScore",
+            MAX(AVG("teamfightKills")) OVER () as "maxScore"
+        FROM champion_game_stats
+        GROUP BY "championName"
+        HAVING COUNT(*) > 50
+    `
+    return championNames.map(name => {
+        const champ = result.find(r => r.championName === name)
+        if (!champ) return null
+        return (champ.score - champ.minScore) / (champ.maxScore - champ.minScore) * 100
+    }).filter(v => v !== null)
 }

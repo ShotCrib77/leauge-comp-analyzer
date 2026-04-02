@@ -1,4 +1,3 @@
-import Badges from "./components/Badges";
 import Footer from "./components/Footer";
 import TeamChampions from "./components/TeamChampions";
 
@@ -35,7 +34,7 @@ export default function HomePage() {
         </div>
       </div>
       <TeamChampions />
-      
+
       <Footer />
     </div>
   );
